@@ -1,2 +1,3 @@
 # Computer_Graphics
-A simple project to introduce the concept of computer graphics
+
+graphic computation project for the generation of the main graphical primitives and their meshes
