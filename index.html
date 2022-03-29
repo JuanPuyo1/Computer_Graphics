@@ -1,13 +1,395 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-  <style>
-    #my-canvas { border: 1px solid gray; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Proyecto, Computacion Grafica</title>
 </head>
+
 <body>
-  <canvas id="my-canvas" width="200" height="200"></canvas>
-  <script src="dot.js">
-  </script>
+  <h1 style="font-size: 40px; font-family: verdana">Proyecto</h1>
+  <h5 style="font-style: normal; font-family: verdana">Juan Esteban Puyo</h5>
+  <h5 style="font-style: normal; font-family: verdana">
+    Laura Alejandra Rocha
+  </h5>
+
+  <div class="dibujo-canvas">
+    <canvas id="myCanvas" width="300" height="300" style="border: 1px solid #000000"></canvas>
+
+    <script>
+      let color;
+      var context;
+      var myCanvas;
+      var escala;
+
+      let vert = [];
+      let ndx = [];
+      let norma = [];
+
+
+      function ejercicio1() {
+        myCanvas = document.getElementById("myCanvas");
+        context = myCanvas.getContext("2d");
+        context.lineWidth = 1;
+        context.strokeStyle = "#000";
+
+        //EJEX
+        context.beginPath();
+        context.moveTo(150, 0);
+        context.lineTo(150, 300);
+        context.stroke();
+        context.closePath();
+        //EJE Y
+        context.beginPath();
+        context.moveTo(0, 150);
+        context.lineTo(300, 150);
+        context.stroke();
+        context.closePath();
+      }
+
+
+      function line(context, x0, y0, x1, y1) {
+        var dx = Math.abs(x1 - x0);
+        var dy = Math.abs(y1 - y0);
+        var sx = (x0 < x1) ? 1 : -1;
+        var sy = (y0 < y1) ? 1 : -1;
+
+        console.log(sx);
+        console.log(sy);
+        var err = dx - dy;
+        var i = 0;
+        //i<=70*escala
+        while (true) {
+          pintar_pixel(context, x0, y0, 0, 0.8); // Do what you need to for this
+
+          if ((x0 === x1) && (y0 === y1)) return;
+          var e2 = 2 * err;
+          if (e2 > -dy) { err -= dy; x0 += sx; }
+          if (e2 < dx) { err += dx; y0 += sy; }
+          i++;
+        }
+      }
+
+
+
+      function set_color(setColor) {
+        color = setColor;
+      }
+
+      function crear_lienzo(width, height) {
+        myCanvas = document.getElementById("myCanvas");
+        //setear ancho y alto
+        myCanvas.width = width;
+        myCanvas.height = height;
+        //crear canvas 2d
+        context = myCanvas.getContext("2d");
+      }
+
+      function pintar_pixel(context, x, y, z, size) {
+        if (color == null) {
+          color = "#000";
+        }
+        if (size == null) {
+          size = 1;
+        }
+
+        //REDONDEADO PARA DECIMALES
+        var pointX = Math.round(x);
+        var pointY = Math.round(y);
+
+        //circulo
+
+        context.beginPath();
+        context.arc(
+          myCanvas.width / 2,
+          myCanvas.height / 2,
+          100,
+          0,
+          2 * Math.PI
+        );
+        context.stroke();
+        context.closePath();
+
+        //DIBUJAR punto
+
+        context.beginPath();
+        context.fillStyle = color;
+        context.arc(pointX, pointY, size, 0, 2 * Math.PI);
+
+        context.stroke();
+        context.fill();
+        context.closePath();
+      }
+
+
+      function pintar_triangulo(context, vert, ndx) {
+        console.log("TRIANGULO");
+        let nt = ndx.length;
+        console.log('nt', nt);
+
+        console.log(vert);
+        console.log(ndx);
+        for (let i = 0; i < nt; i += 3) {
+
+
+          let x0 = parseInt(vert[ndx[i] * 3]);
+          console.log('x0', x0);
+          let y0 = parseInt(vert[ndx[i] * 3 + 1]);
+          console.log('y0', y0);
+          let x1 = parseInt(vert[ndx[i + 1] * 3]);
+          console.log('x1', x1);
+          let y1 = parseInt(vert[ndx[i + 1] * 3 + 1]);
+          console.log('y1', y1);
+          let x2 = parseInt(vert[ndx[i + 2] * 3]);
+          console.log('x2', x2);
+          let y2 = parseInt(vert[ndx[i + 2] * 3 + 1]);
+          console.log('y2', y2);
+
+          line(context, x0 * 100 + myCanvas.width / 2, y0 * 100 + myCanvas.height / 2, x1, y1);
+          line(context, x0 * 100 + myCanvas.width / 2, y0 * 100 + myCanvas.height / 2, x2, y2);
+          line(context, x2, y2, x1, y1);
+        }
+      }
+
+
+
+
+      function malla_disco(context, seg) {
+
+        //VERTICES
+        for (i = 0; i < seg; i++) {
+          vert[3 * i + 0] = Math.round(myCanvas.width / 2 + 100 * Math.cos((2 * Math.PI * i) / seg));
+          vert[3 * i + 1] = Math.round(myCanvas.height / 2 + 100 * Math.sin((2 * Math.PI * i) / seg));
+          vert[3 * i + 2] = 0;
+          console.log(vert[3 * i + 0], vert[3 * i + 1], vert[3 * i + 2]);
+          pintar_pixel(
+            context,
+            vert[3 * i + 0],
+            vert[3 * i + 1],
+            vert[3 * i + 2]
+          );
+        }
+        vert[3 * i + 0] = vert[3 * i + 1] = vert[3 * i + 2] = 0;
+
+        console.log(vert[3 * i + 0], vert[3 * i + 1], vert[3 * i + 2]);
+        pintar_pixel(
+          context,
+          vert[3 * i + 0] * 100 + myCanvas.width / 2,
+          vert[3 * i + 1] * 100 + myCanvas.height / 2,
+          vert[3 * i + 2]
+        );
+
+        //INDICES
+        for (i = 0; i <= seg - 1; i++) {
+          ndx[3 * i + 0] = seg;
+          ndx[3 * i + 1] = i;
+          ndx[3 * i + 2] = (i + 1) % seg;
+
+
+          console.log(ndx[3 * i + 0], ndx[3 * i + 1], ndx[3 * i + 2]);
+        }
+
+
+        return;
+      }
+
+
+      function cono(context, seg) {
+
+        for (i = 0; i < seg; i++) {
+          vert[3 * i + 0] = Math.round(myCanvas.width / 2 + 100 * Math.cos((2 * Math.PI * i) / seg));
+          vert[3 * i + 1] = Math.round(1 * 100 + myCanvas.height / 2);
+          vert[3 * i + 2] = Math.round(myCanvas.height / 2 + 100 * Math.sin((2 * Math.PI * i) / seg));;
+          console.log(vert[3 * i + 0], vert[3 * i + 1], vert[3 * i + 2]);
+          pintar_pixel(
+            context,
+            vert[3 * i + 0],
+            vert[3 * i + 1],
+            vert[3 * i + 2]
+          );
+        }
+        vert[3 * i + 0] = 0;
+        vert[3 * i + 1] = 1;
+        vert[3 * i + 2] = 0;
+        console.log(vert[3 * i + 0], vert[3 * i + 1], vert[3 * i + 2]);
+        pintar_pixel(
+          context,
+          vert[3 * i + 0] * 100 + myCanvas.width / 2,
+          vert[3 * i + 1],
+          vert[3 * i + 2] * 100 + myCanvas.height / 2
+        );
+
+        vert[3 * i + 0] = 0;
+        vert[3 * i + 1] = -1;
+        vert[3 * i + 2] = 0;
+
+        console.log(vert[3 * i + 0], vert[3 * i + 1], vert[3 * i + 2]);
+        pintar_pixel(
+          context,
+          vert[3 * i + 0] * 100 + myCanvas.width / 2,
+          vert[3 * i + 1],
+          vert[3 * i + 2] * 100 + myCanvas.height / 2
+        );
+
+        for (i = 0; i <= seg - 1; i++) {
+          ndx[3 * i + 0] = seg;
+          ndx[3 * i + 1] = i;
+          ndx[3 * i + 2] = (i + 1) % seg;
+          console.log(ndx[3 * i + 0], ndx[3 * i + 1], ndx[3 * i + 2]);
+        }
+
+
+        return;
+      }
+
+      function plano(context, seg) {
+
+        for (i = 0; i < seg+1; i++) {
+          for (j = 0; j < seg+1; j++) {
+            
+            vert.push(i/seg * 100 + myCanvas.width/3);
+            vert.push(j/seg * 100 + myCanvas.height/3);
+            vert.push(0);
+
+            console.log(vert);
+
+          }
+        }
+
+        for (k = 0; k < vert.length; k++) {
+          
+          if(vert[3 * k + 0] === undefined) {
+            break;
+          }
+          console.log("posicion",k, vert[3 * k + 0],vert[3 * k + 1],vert[3 * k + 2]);
+          pintar_pixel(
+          context,
+          vert[3 * k + 0],
+          vert[3 * k + 1],
+          vert[3 * k + 2] 
+        );
+        }
+          
+
+        for (i = 0; i < seg+1; i++) {
+        for (j = 0; j < seg+1; j++) {
+            
+          ndx[3 * i + 0] = seg;
+          ndx[3 * i + 1] = i;
+          ndx[3 * i + 2] = (i + 1) % seg;
+          console.log(ndx[3 * i + 0], ndx[3 * i + 1], ndx[3 * i + 2]);
+
+          }
+        }
+
+      }
+      function pintar_triangulo_plano(context, vert,seg) {
+        
+        console.log(vert);
+
+        for (i = 0; i < vert.length; i+=15) {
+          var j = 0;
+          for (j; j < 12; j+=3) {
+            console.log("j",j);
+            let x0 = vert[j+i];
+            console.log('x0', x0);
+            let y0 = vert[i+j+1];
+            console.log('y0', y0);
+            let x1 = vert[i+j + 18];
+            console.log('x1', x1);
+            let y1 = vert[i+j + 19];
+            console.log('y1', y1);
+            let x2 = vert[i+j + 3];
+            console.log('x2', x2);
+            let y2 = vert[i+j + 4];
+            console.log('y2', y2);
+            
+            let x3 = vert[i+j + 15];
+            console.log('x3', x3);
+            let y3 = vert[i+j + 16];
+            console.log('y3', y3);
+
+            if(x1 == undefined){
+              break;
+            } else {
+              set_color("blue");
+
+            set_color("red");
+            //1 triangulo
+            line(context, x0, y0, x1, y1);
+            
+            line(context, x0, y0, x2, y2);
+            line(context, x2, y2, x1, y1);
+            //2 triangulo
+            line(context, x0, y0, x3, y3);
+            line(context, x3, y3, x1, y1);
+            line(context, x1, y1, x0, y0);
+            }
+            
+            
+            
+          }
+            
+        }
+        
+
+      }
+
+      
+      function cubo(context) {
+        seg =4
+        
+        for ( i=0; i <12; i++) {
+          vert[3 * i + 0] = Math.round(myCanvas.width / 2 + 100 * Math.cos((2*Math.PI * i) / seg) );
+          vert[3 * i + 1] =  Math.round(myCanvas.height / 2 + 100 * Math.sin((2*Math.PI * i)/seg));
+          vert[3 * i + 2] = 0
+          pintar_pixel(
+            context,
+            vert[3 * i + 0],
+          vert[3 * i + 1],
+            vert[3 * i + 2], 5
+          )
+          
+
+         console.log("x",vert[3 * i + 0],"y",vert[3 * i + 1], "z",vert[3 * i + 2])
+          
+        }
+
+        i=0
+        for(i; i <8; i++){
+          console.log("indices")
+          ndx[3 * i + 0] = seg;
+          ndx[3 * i + 1] = i;
+          ndx[3 * i + 2] = ((i + 1) % seg);
+         
+        }
+       
+        return;
+      }
+
+
+
+      ejercicio1();
+      set_color("red");
+      //malla_disco(context, 7);
+      
+      
+      cono(context,12);
+      //cubo(context);
+
+      
+      pintar_triangulo(context,vert,ndx);
+
+      //plano(context,4);
+      //pintar_triangulo_plano(context,vert,4);
+      
+      set_color("green"
+      );
+
+      
+
+    </script>
+  </div>
 </body>
+
 </html>
